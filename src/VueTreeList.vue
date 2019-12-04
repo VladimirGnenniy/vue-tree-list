@@ -23,38 +23,38 @@
 
         <span v-if="model.isLeaf">
           <slot name="leafNodeIcon">
-            <i class="vtl-icon vtl-menu-icon vtl-icon-file"></i>
+            <i class="fas fa-file mr-1 text-info"></i>
           </slot>
         </span>
         <span v-else>
           <slot name="treeNodeIcon">
-            <i class="vtl-icon vtl-menu-icon vtl-icon-folder"></i>
+            <i class="fas fa-folder mr-1 text-warning"></i>
           </slot>
         </span>
 
-        <div class="vtl-node-content" v-if="!editable">
+        <div class="vtl-node-content text-info" :class="model.isLeaf ? 'text-info' : 'text-warning'" v-if="!editable">
           {{model.name}}
         </div>
         <input v-else class="vtl-input" type="text" ref="nodeInput" :value="model.name" @input="updateName" @blur="setUnEditable">
         <div class="vtl-operation" v-show="isHover">
           <span title="add tree node" @click.stop.prevent="addChild(false)" v-if="!model.isLeaf && !model.addTreeNodeDisabled">
             <slot name="addTreeNode">
-              <i class="vtl-icon vtl-icon-folder-plus-e"></i>
+              <i class="fas fa-folder-plus text-info"></i>
             </slot>
           </span>
           <span title="add leaf node" @click.stop.prevent="addChild(true)" v-if="!model.isLeaf && !model.addLeafNodeDisabled">
             <slot name="addLeafNode">
-              <i class="vtl-icon vtl-icon-plus"></i>
+              <i class="fas fa-folder-plus text-info"></i>
             </slot>
           </span>
           <span title="edit" @click.stop.prevent="setEditable" v-if="!model.editNodeDisabled">
             <slot name="editNode">
-              <i class="vtl-icon vtl-icon-edit"></i>
+              <i class="far fa-edit  text-info"></i>
             </slot>
           </span>
           <span title="delete" @click.stop.prevent="delNode" v-if="!model.delNodeDisabled">
             <slot name="delNode">
-              <i class="vtl-icon vtl-icon-trash"></i>
+              <i class="far fa-trash-alt  text-info"></i>
             </slot>
           </span>
         </div>
