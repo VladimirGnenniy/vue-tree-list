@@ -35,7 +35,7 @@
         <div class="vtl-node-content text-info" :class="model.isLeaf ? 'text-info' : 'text-warning'" v-if="!editable">
           {{model.name}}
         </div>
-        <input v-else class="vtl-input" type="text" ref="nodeInput" :value="model.name" @input="updateName" @blur="setUnEditable">
+        <input v-else class="vtl-input" type="text" ref="nodeInput" :value="model.name" @input="updateName" v-on:keyup.enter="emitChangeName" @blur="setUnEditable">
         <div class="vtl-operation" v-show="isHover">
           <span title="add tree node" @click.stop.prevent="addChild(false)" v-if="!model.isLeaf && !model.addTreeNodeDisabled">
             <slot name="addTreeNode">
@@ -99,7 +99,8 @@
         isDragEnterUp: false,
         isDragEnterBottom: false,
         isDragEnterNode: false,
-        expanded: this.defaultExpanded
+        expanded: this.defaultExpanded,
+		oldName: ""
       }
     },
     props: {
@@ -151,24 +152,28 @@
       }
     },
     mounted () {
-      const vm = this
+      /*const vm = this
       addHandler(window, 'keyup', function (e) {
         // click enter
         if (e.keyCode === 13 && vm.editable) {
           vm.editable = false
         }
-      })
+      })*/
     },
     beforeDestroy () {
       removeHandler(window, 'keyup')
     },
     methods: {
       updateName (e) {
-        var oldName = this.model.name;
-        this.model.changeName(e.target.value)
-        var node = this.getRootNode();
-        node.$emit('change-name', {'id': this.model.id, 'oldName': oldName, 'newName': e.target.value})
+        this.oldName = this.model.name;
+        this.model.changeName(e.target.value);
       },
+	  emitChangeName (e) {	
+		if(e.target.value){
+			var node = this.getRootNode();	
+			node.$emit('change-name', {'id': this.model.id, 'oldName': this.oldName, 'newName': e.target.value});
+		}
+	  },
 
       delNode () {
         var node = this.getRootNode()
@@ -176,6 +181,7 @@
       },
 
       setEditable () {
+		this.oldName = this.model.name;
         this.editable = true
         this.$nextTick(() => {
           const $input = this.$refs.nodeInput
@@ -184,8 +190,11 @@
         })
       },
 
-      setUnEditable () {
-        this.editable = false
+      setUnEditable (e) {
+		if(e.target.value){
+			this.editable = false;
+			this.emitChangeName(e);
+		}
       },
 
       toggle() {
@@ -337,9 +346,9 @@
         color: inherit;
       }
     }
-    &:hover {
+    /*&:hover {
       color: blue;
-    }
+    }*/
   }
 
   .vtl-icon-file:before {
@@ -390,7 +399,7 @@
     .vtl-input {
       border: none;
       max-width: 150px;
-      border-bottom: 1px solid blue;
+      /*border-bottom: 1px solid blue;*/
     }
     &:hover {
       background-color: #f0f0f0;
@@ -400,10 +409,12 @@
     }
     .vtl-caret {
       margin-left: -1rem;
+	  cursor: pointer;
     }
     .vtl-operation {
       margin-left: 2rem;
       letter-spacing: 1px;
+	  cursor: pointer;
     }
   }
 
