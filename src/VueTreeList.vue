@@ -35,7 +35,7 @@
         <div class="vtl-node-content text-info" :class="model.isLeaf ? 'text-info' : 'text-warning'" v-if="!editable">
           {{model.name}}
         </div>
-        <input v-else class="vtl-input" type="text" ref="nodeInput" :value="model.name" @input="updateName" v-on:keyup.enter="emitChangeName" @blur="setUnEditable">
+        <input v-else class="vtl-input" type="text" ref="nodeInput" :value="model.name" @input="updateName" v-on:keyup.enter="setUnEditable" @blur="setUnEditable">
         <div class="vtl-operation" v-show="isHover">
           <span title="add tree node" @click.stop.prevent="addChild(false)" v-if="!model.isLeaf && !model.addTreeNodeDisabled">
             <slot name="addTreeNode">
