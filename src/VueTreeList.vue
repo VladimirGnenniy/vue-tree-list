@@ -28,16 +28,16 @@
         </span>
         <span v-else>
           <slot name="treeNodeIcon">
-            <i class="fas fa-folder mr-1 text-warning"></i>
+            <i class="fas fa-folder mr-1 text-info"></i>
           </slot>
         </span>
 
-        <div class="vtl-node-content text-info" :class="model.isLeaf ? 'text-info' : 'text-warning'" v-if="!editable">
+        <div class="vtl-node-content text-info" v-if="!editable">
           {{model.name}}
         </div>
         <input v-else class="vtl-input" type="text" ref="nodeInput" :value="model.name" @input="updateName" v-on:keyup.enter="setUnEditable" @blur="setUnEditable">
         <div class="vtl-operation" v-show="isHover">
-          <span title="add tree node" @click.stop.prevent="addChild(false)" v-if="!model.isLeaf && !model.addTreeNodeDisabled">
+          <span title="Add" @click.stop.prevent="addChild(false)" v-if="!model.isLeaf && !model.addTreeNodeDisabled">
             <slot name="addTreeNode">
               <i class="fas fa-folder-plus text-info"></i>
             </slot>
@@ -47,12 +47,12 @@
               <i class="fas fa-folder-plus text-info"></i>
             </slot>
           </span>
-          <span title="edit" @click.stop.prevent="setEditable" v-if="!model.editNodeDisabled">
+          <span title="Edit" @click.stop.prevent="setEditable" v-if="!model.editNodeDisabled">
             <slot name="editNode">
               <i class="far fa-edit  text-info"></i>
             </slot>
           </span>
-          <span title="delete" @click.stop.prevent="delNode" v-if="!model.delNodeDisabled">
+          <span title="Delete" @click.stop.prevent="delNode" v-if="!model.delNodeDisabled">
             <slot name="delNode">
               <i class="far fa-trash-alt  text-info"></i>
             </slot>
