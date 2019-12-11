@@ -14,6 +14,7 @@ const TreeNode = function (data) {
   this.parent = null
   this.children = null
   this.isLeaf = !!isLeaf
+  this.title = ''
 
   // other params
   for (var k in data) {

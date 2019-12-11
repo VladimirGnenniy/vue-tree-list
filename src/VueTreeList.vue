@@ -23,16 +23,16 @@
 
         <span v-if="model.isLeaf">
           <slot name="leafNodeIcon">
-            <i class="fas fa-file mr-1 text-info"></i>
+            <i class="fas fa-file mr-1 text-info" :title="model.title"></i>
           </slot>
         </span>
         <span v-else>
           <slot name="treeNodeIcon">
-            <i class="fas fa-folder mr-1 text-info"></i>
+            <i class="fas fa-folder mr-1 text-info" :title="model.title"></i>
           </slot>
         </span>
 
-        <div class="vtl-node-content text-info" v-if="!editable">
+        <div class="vtl-node-content text-info" :title="model.title" v-if="!editable">
           {{model.name}}
         </div>
         <input v-else class="vtl-input" type="text" ref="nodeInput" :value="model.name" @input="updateName" v-on:keyup.enter="setUnEditable" @blur="setUnEditable">
@@ -118,7 +118,11 @@
       defaultExpanded: {
         type: Boolean,
         default: true
-      }
+      },
+	  title: {
+		type: String,
+		default: ''
+	  }
     },
     computed: {
       itemIconClass () {
@@ -182,12 +186,17 @@
 
       setEditable () {
 		this.oldName = this.model.name;
-        this.editable = true
-        this.$nextTick(() => {
-          const $input = this.$refs.nodeInput
-          $input.focus()
-          $input.setSelectionRange(0, $input.value.length)
-        })
+		if(this.model.isLeaf){		
+			var node = this.getRootNode();		
+			node.$emit('change-name', {'id': this.model.id, 'oldName': this.oldName, 'newName': this.oldName});
+		} else {
+			this.editable = true
+			this.$nextTick(() => {
+			  const $input = this.$refs.nodeInput
+			  $input.focus()
+			  $input.setSelectionRange(0, $input.value.length)
+			})
+		}
       },
 
       setUnEditable (e) {
