@@ -29,7 +29,7 @@
 
         <span v-if="model.isLeaf">
           <slot name="leafNodeIcon">
-            <i class="fas fa-file mr-1 text-info" :title="model.title"></i>
+            <i class="far fa-file mr-1 text-info" :title="model.title"></i>
           </slot>
         </span>
         <span v-else>
