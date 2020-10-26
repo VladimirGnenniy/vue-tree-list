@@ -101,12 +101,15 @@
       v-if="isFolder"
     >
       <item
+        v-bind:selectedItem="localSelectedItem"
         v-for="model in model.children"
         :default-tree-node-name="defaultTreeNodeName"
         :default-leaf-node-name="defaultLeafNodeName"
         v-bind:default-expanded="defaultExpanded"
         :model="model"
         :key="model.id"
+        :class="{[defaultActiveTreeNodeClass]: localSelectedItem && model.id === localSelectedItem.id}"
+        :default-active-tree-node-class="defaultActiveTreeNodeClass"
       >
         <slot name="addTreeNode" slot="addTreeNode" />
         <slot name="addLeafNode" slot="addLeafNode" />
@@ -133,7 +136,8 @@ export default {
       isDragEnterBottom: false,
       isDragEnterNode: false,
       expanded: this.defaultExpanded,
-      oldName: ""
+      oldName: "",
+      localSelectedItem: this.selectedItem
     };
   },
   props: {
@@ -159,6 +163,19 @@ export default {
     customActionTitle: {
       type: String,
       default: ""
+    },
+    selectedItem: {
+      type: Object,
+      default: null
+    },
+    defaultActiveTreeNodeClass: {
+      type: String,
+      default: null
+    }
+  },
+  watch: {
+    selectedItem: function (value) {
+      this.localSelectedItem = value;
     }
   },
   computed: {
@@ -269,6 +286,7 @@ export default {
 
     click() {
       var node = this.getRootNode();
+      node.localSelectedItem = this.model;
       node.$emit("click", this.model);
     },
 

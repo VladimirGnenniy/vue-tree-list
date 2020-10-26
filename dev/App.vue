@@ -12,7 +12,9 @@
           :model="data"
           default-tree-node-name="new node"
           default-leaf-node-name="new leaf"
-          v-bind:default-expanded="false">
+          v-bind:default-expanded="false"
+          default-active-tree-node-class="active-tree-node"
+        >
           <span class="icon" slot="addTreeNode">addTreeNode</span>
           <span class="icon" slot="addLeafNode">addLeafNode</span>
           <span class="icon" slot="editNode">editNode</span>
@@ -132,6 +134,10 @@
   }
 </script>
 <style lang="less" rel="stylesheet/less">
+  .active-tree-node {
+    color: red;
+  }
+
   .vtl {
     .vtl-drag-disabled {
       background-color: #d0cfcf;

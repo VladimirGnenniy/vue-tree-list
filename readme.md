@@ -158,6 +158,8 @@ model | TreeNode | - | You can use `const head = new Tree([])` to generate a tre
 default-tree-node-name | string | New node node | Default name for new treenode
 default-leaf-node-name | string | New leaf node | Default name for new leafnode
 default-expanded | boolean | true | Tree is expanded or not
+default-active-tree-node-class | string | null | Class to apply for selected tree items
+selected-item | object | null | Object to select
 
 
 ## props of TreeNode
