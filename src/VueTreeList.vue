@@ -108,8 +108,11 @@
         v-bind:default-expanded="defaultExpanded"
         :model="model"
         :key="model.id"
-        :class="{[defaultActiveTreeNodeClass]: localSelectedItem && model.id === localSelectedItem.id}"
+        :allow-selection-of="allowSelectionOf"
+        :class="getTreeItemClasses(model)"
+        :default-active-node-class="defaultActiveNodeClass"
         :default-active-tree-node-class="defaultActiveTreeNodeClass"
+        :default-active-leaf-node-class="defaultActiveLeafNodeClass"
       >
         <slot name="addTreeNode" slot="addTreeNode" />
         <slot name="addLeafNode" slot="addLeafNode" />
@@ -126,6 +129,12 @@ import { Tree, TreeNode } from "./Tree.js";
 import { addHandler, removeHandler } from "./tools.js";
 
 let compInOperation = null;
+
+const ALLOW_SELECTION_MODES = {
+  TREE: (node) => !node.isLeaf,
+  LEAF: (node) => node.isLeaf,
+  BOTH: (node) => true
+}
 
 export default {
   data: function() {
@@ -168,9 +177,24 @@ export default {
       type: Object,
       default: null
     },
+    defaultActiveNodeClass: {
+      type: String,
+      default: null
+    },
     defaultActiveTreeNodeClass: {
       type: String,
       default: null
+    },
+    defaultActiveLeafNodeClass: {
+      type: String,
+      default: null
+    },
+    allowSelectionOf: {
+      type: String,
+      default: null,
+      validator: function (value) {
+        return value === null || value.trim().toUpperCase() in ALLOW_SELECTION_MODES;
+      }
     }
   },
   watch: {
@@ -286,7 +310,22 @@ export default {
 
     click() {
       var node = this.getRootNode();
-      node.localSelectedItem = this.model;
+
+      var shallSelect = true;
+      
+      if(node.allowSelectionOf) {
+          var normalizedAllowSelectionOf = node.allowSelectionOf.trim().toUpperCase();
+
+          if(normalizedAllowSelectionOf in ALLOW_SELECTION_MODES){
+            shallSelect = ALLOW_SELECTION_MODES[normalizedAllowSelectionOf](this.model);
+          }
+      }
+
+      if(shallSelect) {
+        node.localSelectedItem = this.model;
+        node.$emit('select', this.model);
+      }
+
       node.$emit("click", this.model);
     },
 
@@ -392,6 +431,28 @@ export default {
         node = node.$parent;
       }
       return node;
+    },
+    getTreeItemClasses(treeItem) {      
+      var selectedItem = this.localSelectedItem;
+      var isSelected = selectedItem !== null && selectedItem !== undefined && treeItem.id === selectedItem.id;
+
+      var classes = new Set();
+
+      if(isSelected){
+        if(this.defaultActiveNodeClass) {
+          classes.add(this.defaultActiveNodeClass);
+        }
+
+        if(selectedItem.isLeaf) {
+          if(this.defaultActiveLeafNodeClass) {
+            classes.add(this.defaultActiveLeafNodeClass);
+          }
+        } else if(this.defaultActiveTreeNodeClass) {
+            classes.add(this.defaultActiveTreeNodeClass);
+        }
+      }
+
+      return Array.from(classes);
     }
   },
   beforeCreate() {

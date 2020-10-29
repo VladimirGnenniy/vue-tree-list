@@ -158,8 +158,11 @@ model | TreeNode | - | You can use `const head = new Tree([])` to generate a tre
 default-tree-node-name | string | New node node | Default name for new treenode
 default-leaf-node-name | string | New leaf node | Default name for new leafnode
 default-expanded | boolean | true | Tree is expanded or not
+allow-selection-of | null, 'tree', 'leaf', 'both'| null | Which type of nodes to select
+default-active-node-class | string | null | Class to apply for selected items
 default-active-tree-node-class | string | null | Class to apply for selected tree items
-selected-item | object | null | Object to select
+default-active-leaf-node-class | string | null | Class to apply for selected leaf items
+selected-item | object | null | Node to preselect
 
 
 ## props of TreeNode
@@ -195,6 +198,7 @@ add-node | TreeNode | Trigger after adding a new node
 drop | {node, src, target} | Trigger after dropping a node into another. node: the draggable node, src: the draggable node's parent, target: the node that draggable node will drop into
 drop-before | {node, src, target} | Trigger after dropping a node before another. node: the draggable node, src: the draggable node's parent, target: the node that draggable node will drop before
 drop-after | {node, src, target} | Trigger after dropping a node after another. node: the draggable node, src: the draggable node's parent, target: the node that draggable node will drop after
+select | TreeNode | Trigger when selecting a tree node
 
 # customize operation icons
 The component has default icons for `addTreeNode`, `addLeafNode`, `editNode`, `delNode` button, but you can also customize them:

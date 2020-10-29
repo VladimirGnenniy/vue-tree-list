@@ -13,7 +13,10 @@
           default-tree-node-name="new node"
           default-leaf-node-name="new leaf"
           v-bind:default-expanded="false"
+          default-active-node-class="active-node"
           default-active-tree-node-class="active-tree-node"
+          default-active-leaf-node-class="active-leaf-node"
+          allow-selection-of="both"
         >
           <span class="icon" slot="addTreeNode">addTreeNode</span>
           <span class="icon" slot="addLeafNode">addLeafNode</span>
@@ -134,8 +137,16 @@
   }
 </script>
 <style lang="less" rel="stylesheet/less">
+  .active-node {
+    border: 1px solid yellow;
+  }
+
   .active-tree-node {
     color: red;
+  }
+  
+  .active-leaf-node {
+    color: green;
   }
 
   .vtl {
