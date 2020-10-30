@@ -101,13 +101,14 @@
       v-if="isFolder"
     >
       <item
-        v-bind:selectedItem="localSelectedItem"
+        :selectedItem="localSelectedItem"
         v-for="model in model.children"
         :default-tree-node-name="defaultTreeNodeName"
         :default-leaf-node-name="defaultLeafNodeName"
-        v-bind:default-expanded="defaultExpanded"
+        :default-expanded="defaultExpanded"
         :model="model"
         :key="model.id"
+        :prevent-leaves-in-root="preventLeavesInRoot"
         :allow-selection-of="allowSelectionOf"
         :class="getTreeItemClasses(model)"
         :default-active-node-class="defaultActiveNodeClass"
@@ -195,6 +196,9 @@ export default {
       validator: function (value) {
         return value === null || value.trim().toUpperCase() in ALLOW_SELECTION_MODES;
       }
+    },
+    preventLeavesInRoot: {
+      type: Boolean
     }
   },
   watch: {
@@ -251,6 +255,7 @@ export default {
         var node = this.getRootNode();
         node.$emit("change-name", {
           id: this.model.id,
+          isLeaf: this.model.isLeaf,
           oldName: this.oldName,
           newName: e.target.value
         });
@@ -269,21 +274,13 @@ export default {
 
     setEditable() {
       this.oldName = this.model.name;
-      if (this.model.isLeaf) {
-        var node = this.getRootNode();
-        node.$emit("change-name", {
-          id: this.model.id,
-          oldName: this.oldName,
-          newName: this.oldName
-        });
-      } else {
-        this.editable = true;
-        this.$nextTick(() => {
-          const $input = this.$refs.nodeInput;
-          $input.focus();
-          $input.setSelectionRange(0, $input.value.length);
-        });
-      }
+
+      this.editable = true;
+      this.$nextTick(() => {
+        const $input = this.$refs.nodeInput;
+        $input.focus();
+        $input.setSelectionRange(0, $input.value.length);
+      });
     },
 
     setUnEditable(e) {
@@ -311,17 +308,7 @@ export default {
     click() {
       var node = this.getRootNode();
 
-      var shallSelect = true;
-      
-      if(node.allowSelectionOf) {
-          var normalizedAllowSelectionOf = node.allowSelectionOf.trim().toUpperCase();
-
-          if(normalizedAllowSelectionOf in ALLOW_SELECTION_MODES){
-            shallSelect = ALLOW_SELECTION_MODES[normalizedAllowSelectionOf](this.model);
-          }
-      }
-
-      if(shallSelect) {
+      if(this.canBeSelected(this.model)) {
         node.localSelectedItem = this.model;
         node.$emit('select', this.model);
       }
@@ -378,6 +365,7 @@ export default {
 
     dragEnterUp() {
       if (!compInOperation) return;
+      if (this.preventLeavesInRoot && compInOperation.model.isLeaf && this.model.parent.name === 'root') return;
       this.isDragEnterUp = true;
     },
     dragOverUp(e) {
@@ -390,6 +378,7 @@ export default {
     },
     dropBefore() {
       if (!compInOperation) return;
+      if (this.preventLeavesInRoot && compInOperation.model.isLeaf && this.model.parent.name === 'root') return;
       const oldParent = compInOperation.model.parent;
       compInOperation.model.insertBefore(this.model);
       this.isDragEnterUp = false;
@@ -403,6 +392,7 @@ export default {
 
     dragEnterBottom() {
       if (!compInOperation) return;
+      if (this.preventLeavesInRoot && compInOperation.model.isLeaf && this.model.parent.name === 'root') return;
       this.isDragEnterBottom = true;
     },
     dragOverBottom(e) {
@@ -415,6 +405,7 @@ export default {
     },
     dropAfter() {
       if (!compInOperation) return;
+      if (this.preventLeavesInRoot && compInOperation.model.isLeaf && this.model.parent.name === 'root') return;
       const oldParent = compInOperation.model.parent;
       compInOperation.model.insertAfter(this.model);
       this.isDragEnterBottom = false;
@@ -452,7 +443,24 @@ export default {
         }
       }
 
+      if(this.canBeSelected(treeItem)) {
+        classes.add('vtl-selectable-item');
+      }
+
       return Array.from(classes);
+    },
+    canBeSelected(treeItem) {      
+      var canBeSelected = true;
+      
+      if(this.allowSelectionOf) {
+          var normalizedAllowSelectionOf = this.allowSelectionOf.trim().toUpperCase();
+
+          if(normalizedAllowSelectionOf in ALLOW_SELECTION_MODES){
+            canBeSelected = ALLOW_SELECTION_MODES[normalizedAllowSelectionOf](treeItem);
+          }
+      }
+
+      return canBeSelected;
     }
   },
   beforeCreate() {
@@ -563,9 +571,10 @@ export default {
   }
 }
 
-.vtl-item {
+.vtl-selectable-item > * > .vtl-tree-node {
   cursor: pointer;
 }
+
 .vtl-tree-margin {
   margin-left: 2em;
 }

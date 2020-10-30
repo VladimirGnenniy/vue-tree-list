@@ -10,31 +10,39 @@ A vue component for tree structure. Support adding treenode/leafnode, editing no
 
 ```html
 <template>
-  <div>
-    <button @click="addNode">Add Node</button>
-    <vue-tree-list
-      @click="onClick"
-      @change-name="onChangeName"
-      @delete-node="onDel"
-      @add-node="onAddNode"
-      :model="data"
-      default-tree-node-name="new node"
-      default-leaf-node-name="new leaf"
-      v-bind:default-expanded="false">
-      <span class="icon" slot="addTreeNode">addTreeNode</span>
-      <span class="icon" slot="addLeafNode">addLeafNode</span>
-      <span class="icon" slot="editNode">editNode</span>
-      <span class="icon" slot="delNode">delNode</span>
-    </vue-tree-list>
-    <button @click="getNewTree">Get new tree</button>
-    <pre>
-      {{newTree}}
-    </pre>
-  </div>
+    <div>
+        <button @click="addNode">Add Node</button>
+        <vue-tree-list
+          @click="onClick"
+          @change-name="onChangeName"
+          @delete-node="onDel"
+          @add-node="onAddNode"
+          @drop="drop"
+          @drop-before="dropBefore"
+          @drop-after="dropAfter"
+          :model="data"
+          v-bind:prevent-leaves-in-root="true"
+          default-tree-node-name="new node"
+          default-leaf-node-name="new leaf"
+          v-bind:default-expanded="false"
+          default-active-node-class="active-node"
+          default-active-tree-node-class="active-tree-node"
+          default-active-leaf-node-class="active-leaf-node"
+          allow-selection-of="both"
+        >
+          <span class="icon" slot="addTreeNode">addTreeNode</span>
+          <span class="icon" slot="addLeafNode">addLeafNode</span>
+          <span class="icon" slot="editNode">editNode</span>
+          <span class="icon" slot="delNode">delNode</span>
+        </vue-tree-list>
+        <button @click="getNewTree">Get new tree</button>
+        <pre>
+          {{newTree}}
+        </pre>
+    </div>
 </template>
-
 <script>
-  import { VueTreeList, Tree, TreeNode } from 'vue-tree-list'
+  import { VueTreeList, Tree, TreeNode } from '../src'
   export default {
     components: {
       VueTreeList
@@ -93,6 +101,18 @@ A vue component for tree structure. Support adding treenode/leafnode, editing no
         console.log(params)
       },
 
+      drop: function ({node, src, target}) {
+        console.log('drop', node, src, target)
+      },
+
+      dropBefore: function ({node, src, target}) {
+        console.log('drop-before', node, src, target)
+      },
+
+      dropAfter: function ({node, src, target}) {
+        console.log('drop-after', node, src, target)
+      },
+
       addNode () {
         var node = new TreeNode({ name: 'new node', isLeaf: false })
         if (!this.data.children) this.data.children = []
@@ -121,12 +141,26 @@ A vue component for tree structure. Support adding treenode/leafnode, editing no
 
         vm.newTree = _dfs(vm.data)
       },
-      
+
+      onClick(model) {
+        console.log(model)
+      }
     }
   }
 </script>
-
 <style lang="less" rel="stylesheet/less">
+  .active-node {
+    border: 1px solid yellow;
+  }
+
+  .active-tree-node {
+    color: red;
+  }
+  
+  .active-leaf-node {
+    color: green;
+  }
+
   .vtl {
     .vtl-drag-disabled {
       background-color: #d0cfcf;
@@ -163,6 +197,7 @@ default-active-node-class | string | null | Class to apply for selected items
 default-active-tree-node-class | string | null | Class to apply for selected tree items
 default-active-leaf-node-class | string | null | Class to apply for selected leaf items
 selected-item | object | null | Node to preselect
+prevent-leaves-in-root | boolean | false | Whether to prevent dropping leaves on to the root level
 
 
 ## props of TreeNode

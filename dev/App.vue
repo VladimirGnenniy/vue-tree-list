@@ -10,9 +10,10 @@
           @drop-before="dropBefore"
           @drop-after="dropAfter"
           :model="data"
+          :prevent-leaves-in-root="true"
           default-tree-node-name="new node"
           default-leaf-node-name="new leaf"
-          v-bind:default-expanded="false"
+          :default-expanded="false"
           default-active-node-class="active-node"
           default-active-tree-node-class="active-tree-node"
           default-active-leaf-node-class="active-leaf-node"
@@ -51,7 +52,7 @@
             children: [
               {
                 name: 'Node 1-2',
-                id: 2,
+                id: 1,
                 isLeaf: true,
                 pid: 1
               }
