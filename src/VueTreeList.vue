@@ -68,7 +68,7 @@
               <i class="fas fa-folder-plus text-info"></i>
             </slot>
           </span>
-          <span title="Edit" @click.stop.prevent="setEditable" v-if="!model.editNodeDisabled">
+          <span title="Edit" @click.stop.prevent="edit" v-if="!model.editNodeDisabled">
             <slot name="editNode">
               <i class="far fa-edit text-info"></i>
             </slot>
@@ -108,6 +108,10 @@
         :default-expanded="defaultExpanded"
         :model="model"
         :key="model.id"
+        :edit-tree-node-actions="editTreeNodeActions"
+        :edit-leaf-actions="editLeafActions"
+        :click-tree-node-actions="clickTreeNodeActions"
+        :click-leaf-actions="clickLeafActions"
         :prevent-leaves-in-root="preventLeavesInRoot"
         :allow-selection-of="allowSelectionOf"
         :class="getTreeItemClasses(model)"
@@ -137,6 +141,31 @@ const ALLOW_SELECTION_MODES = {
   BOTH: (node) => true
 }
 
+function validateNodeActions(actions, predefinedActions) {
+  let isValid = true;
+
+  const normalizedPredefinedActions = predefinedActions.map(predefinedAction => 
+    predefinedAction.trim().toUpperCase()
+  );
+
+  for(const action of actions) {
+    if(typeof(action) !== 'function' ) {
+      if(typeof(action) !== 'string' || predefinedActions.length === 0) {
+        isValid = false;
+        break;
+      }
+      
+      var normalizedAction = action.trim().toUpperCase();           
+      if(!normalizedPredefinedActions.includes(normalizedAction)) {
+        isValid = false;
+        break;
+      }
+    }
+  }
+
+  return isValid;
+}
+
 export default {
   data: function() {
     return {
@@ -153,6 +182,42 @@ export default {
   props: {
     model: {
       type: Object
+    },
+    editTreeNodeActions: {
+        type: Array,
+        default: function () {
+          return ['set-editable'];
+        },
+        validator: function (actions) {
+          return validateNodeActions(actions, ['set-editable']);
+        }
+    },
+    editLeafActions: {
+        type: Array,
+        default: function () {
+          return ['set-editable'];
+        },
+        validator: function (actions) {
+          return validateNodeActions(actions, ['set-editable']);
+        }
+    },
+    clickTreeNodeActions: {
+        type: Array,
+        default: function () {
+          return [];
+        },
+        validator: function (actions) {
+          return validateNodeActions(actions, ['select']);
+        }
+    },
+    clickLeafActions: {
+        type: Array,
+        default: function () {
+          return ['select'];
+        },
+        validator: function (actions) {
+          return validateNodeActions(actions, ['select']);
+        }
     },
     defaultLeafNodeName: {
       type: String,
@@ -272,6 +337,22 @@ export default {
       node.$emit("custom-action", this.model);
     },
 
+    edit() {
+      const actions = this.model.isLeaf ? this.editLeafActions : this.editTreeNodeActions;
+
+      for(const action of actions) {
+        if(typeof(action) === 'function') {
+          action(this.model);
+        } else {
+          var normalizedAction = action.trim().toUpperCase();
+
+          if(normalizedAction === 'SET-EDITABLE') {
+            this.setEditable();
+          }
+        }
+      }
+    },
+
     setEditable() {
       this.oldName = this.model.name;
 
@@ -306,14 +387,31 @@ export default {
     },
 
     click() {
-      var node = this.getRootNode();
+      const node = this.getRootNode();
 
+      const actions = this.model.isLeaf ? this.clickLeafActions : this.clickTreeNodeActions;
+
+      for(const action of actions) {
+        if(typeof(action) === 'function') {
+          action(this.model);
+        } else {
+          var normalizedAction = action.trim().toUpperCase();
+
+          if(normalizedAction === 'SELECT') {
+              this.trySelectItem(node);
+          }
+        }
+      }
+
+      this.toggle();
+      node.$emit("click", this.model);
+    },
+
+    trySelectItem(node) {
       if(this.canBeSelected(this.model)) {
         node.localSelectedItem = this.model;
         node.$emit('select', this.model);
       }
-
-      node.$emit("click", this.model);
     },
 
     addChild(isLeaf) {

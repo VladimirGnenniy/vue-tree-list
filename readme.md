@@ -198,6 +198,10 @@ default-active-tree-node-class | string | null | Class to apply for selected tre
 default-active-leaf-node-class | string | null | Class to apply for selected leaf items
 selected-item | object | null | Node to preselect
 prevent-leaves-in-root | boolean | false | Whether to prevent dropping leaves on to the root level
+edit-tree-node-actions | (function (`TreeNode`) , 'set-editable')[] | ['set-editable'] | What to do when edit icon is clicked on a tree node
+edit-leaf-actions | (function (`TreeNode`) , 'set-editable')[] | ['set-editable'] | What to do when edit icon is clicked on a leaf
+click-tree-node-actions | (function (`TreeNode`) , 'select')[] | ['select'] | What to do when a tree node is clicked
+click-leaf-node-actions | (function (`TreeNode`) , 'select')[] | ['select'] | What to do when a leaf is clicked
 
 
 ## props of TreeNode

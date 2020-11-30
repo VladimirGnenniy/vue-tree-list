@@ -10,6 +10,7 @@
           @drop-before="dropBefore"
           @drop-after="dropAfter"
           :model="data"
+          :edit-actions="['set-editable', onEdit]"
           :prevent-leaves-in-root="true"
           default-tree-node-name="new node"
           default-leaf-node-name="new leaf"
@@ -106,6 +107,10 @@
         var node = new TreeNode({ name: 'new node', isLeaf: false })
         if (!this.data.children) this.data.children = []
         this.data.addChildren(node)
+      },
+
+      onEdit(item) {
+        console.log(item);
       },
 
       getNewTree () {
