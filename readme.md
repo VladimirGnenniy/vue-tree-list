@@ -215,6 +215,7 @@ addTreeNodeDisabled | boolean | false | Show `addTreeNode` button or not
 addLeafNodeDisabled | boolean | false | Show `addLeafNode` button or not
 editNodeDisabled | boolean | false | Show `editNode` button or not
 delNodeDisabled | boolean | false | Show `delNode` button or not
+iconClasses | string | null | What classes to apply for node's icon
 children | array | null | The children of node
 
 ### methods

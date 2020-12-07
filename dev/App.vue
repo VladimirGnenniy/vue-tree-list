@@ -43,6 +43,7 @@
         data: new Tree([
           {
             name: 'Node 1',
+            iconClasses: 'custom-icon',
             id: 1,
             pid: 0,
             dragDisabled: true,
@@ -153,6 +154,12 @@
   
   .active-leaf-node {
     color: green;
+  }
+
+  .custom-icon::before {
+    content: 'x';
+    font-style:  normal;
+    margin-right: 0.5em
   }
 
   .vtl {

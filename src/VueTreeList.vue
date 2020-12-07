@@ -29,12 +29,12 @@
 
         <span v-if="model.isLeaf">
           <slot name="leafNodeIcon">
-            <i class="far fa-file mr-1 text-info" :title="model.title"></i>
+            <i :class="[model.iconClasses ? model.iconClasses : 'far fa-file', 'mr-1', 'text-info']" :title="model.title"></i>
           </slot>
         </span>
         <span v-else>
           <slot name="treeNodeIcon">
-            <i class="fas fa-folder mr-1 text-info" :title="model.title"></i>
+            <i :class="[model.iconClasses ? model.iconClasses : 'far fa-folder', 'mr-1', 'text-info']" :title="model.title"></i>
           </slot>
         </span>
 
@@ -273,7 +273,13 @@ export default {
   },
   computed: {
     itemIconClass() {
-      return this.model.isLeaf ? "vtl-icon-file" : "vtl-icon-folder";
+      if(this.model.iconClasses) {
+        return this.model.iconClasses;
+      }
+
+      return this.model.isLeaf 
+        ? "vtl-icon-file"
+        : "vtl-icon-folder";
     },
 
     caretClass() {
@@ -647,6 +653,8 @@ export default {
   display: flex;
   align-items: center;
   padding: 5px 0 5px 1rem;
+  cursor: pointer;
+  
   .vtl-input {
     border: none;
     max-width: 150px;
@@ -667,10 +675,6 @@ export default {
     letter-spacing: 1px;
     cursor: pointer;
   }
-}
-
-.vtl-selectable-item > * > .vtl-tree-node {
-  cursor: pointer;
 }
 
 .vtl-tree-margin {

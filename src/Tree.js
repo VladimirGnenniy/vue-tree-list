@@ -7,14 +7,16 @@
  *   id: id
  *   dragDisabled: decide if it can be dragged
  *   disabled: desabled all operation
+ *   iconClasses: what classes to apply for node's icon
  */
 const TreeNode = function (data) {
-  const { id, isLeaf } = data
+  const { id, isLeaf, iconClasses} = data
   this.id = (typeof id === 'undefined') ? new Date().valueOf() : id
   this.parent = null
   this.children = null
   this.isLeaf = !!isLeaf
   this.title = ''
+  this.iconClasses = iconClasses || null
 
   // other params
   for (var k in data) {
